@@ -31,6 +31,11 @@ struct Cocktail: Decodable, Identifiable {
 
 
 extension Cocktail{
+    
+    var minutesToPrepare: String {
+        "\(preparationMinutes) minutes"
+    }
+    
     static func createMock() -> Cocktail {
         .init(id: "0",
               name: "Piña colada",

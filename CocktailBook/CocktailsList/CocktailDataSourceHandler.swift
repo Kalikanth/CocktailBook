@@ -82,7 +82,8 @@ class CocktailShortInfoTVCell: UITableViewCell {
     }
     
     func configureCell(with cocktail: Cocktail) {
-        let swiftUIView = CocktailShortInfoView(cocktail: cocktail)
+        let isFavourite = UserDefaults.getUserFavourites().contains(cocktail.id)
+        let swiftUIView = CocktailShortInfoView(cocktail: cocktail,isFavorite: isFavourite)
         hostingController = UIHostingController(rootView: swiftUIView)
         hostingController?.view.translatesAutoresizingMaskIntoConstraints = false
         

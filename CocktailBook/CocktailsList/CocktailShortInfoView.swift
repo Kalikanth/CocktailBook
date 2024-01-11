@@ -10,7 +10,7 @@ import SwiftUI
 struct CocktailShortInfoView: View {
     
     let cocktail: Cocktail
-    let isFavorite: Bool = false
+    let isFavorite: Bool
     
     var body: some View {
         HStack {
@@ -35,8 +35,8 @@ struct CocktailShortInfoView: View {
 struct CocktailShortInfoView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            CocktailShortInfoView(cocktail: Cocktail.createMock())
-            CocktailShortInfoView(cocktail: Cocktail.createMock())
+            CocktailShortInfoView(cocktail: Cocktail.createMock(), isFavorite: false)
+            CocktailShortInfoView(cocktail: Cocktail.createMock(), isFavorite: false)
                 .environment(\.colorScheme, .dark)
         }
     }
