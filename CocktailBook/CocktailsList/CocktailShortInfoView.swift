@@ -10,13 +10,14 @@ import SwiftUI
 struct CocktailShortInfoView: View {
     
     let cocktail: Cocktail
-    let isFavorite: Bool = true
+    let isFavorite: Bool = false
     
     var body: some View {
         HStack {
             VStack(alignment: .leading,spacing: 6) {
                 Text(cocktail.name)
                     .font(.headline)
+                    .foregroundColor(isFavorite ? .red : Color("headline") )
                 Text(cocktail.shortDescription)
                     .font(.subheadline)
                     .foregroundColor(.gray)

@@ -7,11 +7,17 @@
 
 import Foundation
 
+enum FilterType: String, CaseIterable, Codable {
+    case all = "All Cocktails"
+    case alcoholic = "alcoholic"
+    case nonAlcoholic = "non-alcoholic"
+}
+
 // MARK: - Cocktail Model
 struct Cocktail: Decodable, Identifiable {
     let id: String
     let name: String
-    let type: String
+    let type: FilterType
     let shortDescription: String
     let longDescription: String
     let preparationMinutes: Int
@@ -24,7 +30,7 @@ extension Cocktail{
     static func createMock() -> Cocktail {
         .init(id: "0",
               name: "Piña colada",
-              type: "alcoholic",
+              type: .alcoholic,
               shortDescription: "Velvety-smooth texture and a taste of the tropics are what this tropical drink delivers.",
               longDescription: "he Piña Colada is a Puerto Rican rum drink made with pineapple juice (the name means “strained pineapple” in Spanish) and cream of coconut. By most accounts, the modern-day Piña Colada seems to have originated from a 1954 version that bartender named Ramón “Monchito” Marrero Perez shook up at The Caribe Hilton hotel in San Juan, Puerto Rico. While you may not be sipping this icy-cold tiki drink on the beaches of Puerto Rico, it’s sure to get you in a sunny mood no matter the season.",
               preparationMinutes: 7,
