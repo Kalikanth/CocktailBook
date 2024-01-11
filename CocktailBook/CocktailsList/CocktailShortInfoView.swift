@@ -1,0 +1,42 @@
+//
+//  CocktailShortInfoView.swift
+//  CocktailBook
+//
+//  Created by kiran kumar Gajula on 11/01/24.
+//
+
+import SwiftUI
+
+struct CocktailShortInfoView: View {
+    
+    let cocktail: Cocktail
+    let isFavorite: Bool = true
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading,spacing: 6) {
+                Text(cocktail.name)
+                    .font(.headline)
+                Text(cocktail.shortDescription)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+            Spacer()
+            if isFavorite {
+                Image(systemName: "heart.fill")
+                    .foregroundColor(.red)
+            }
+        }
+        .padding()
+    }
+}
+
+struct CocktailShortInfoView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            CocktailShortInfoView(cocktail: Cocktail.createMock())
+            CocktailShortInfoView(cocktail: Cocktail.createMock())
+                .environment(\.colorScheme, .dark)
+        }
+    }
+}
