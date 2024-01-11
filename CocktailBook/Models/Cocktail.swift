@@ -11,6 +11,10 @@ enum FilterType: String, CaseIterable, Codable {
     case all = "All Cocktails"
     case alcoholic = "alcoholic"
     case nonAlcoholic = "non-alcoholic"
+    
+    var navTitle: String {
+        self.rawValue.capitalized
+    }
 }
 
 // MARK: - Cocktail Model

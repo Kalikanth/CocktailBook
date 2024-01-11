@@ -10,6 +10,8 @@ import Combine
 
 class CocktailMainListViewController: UIViewController, ViewControllerPortocol {
 
+    @IBOutlet weak var segmentView: UIStackView!
+    @IBOutlet weak var tableView: UITableView!
     
     private var cancellables: Set<AnyCancellable> = []
     
@@ -18,11 +20,31 @@ class CocktailMainListViewController: UIViewController, ViewControllerPortocol {
        return CocktailMainListViewModel(service: cocktailApi)
     }()
     
+    var dataSourceHandler: CocktailDataSourceHandler!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        initialiseDataSourceHandler()
         setupBindings()
         viewModel.fetchList()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupFilters()
+    }
+    
+    private func initialiseDataSourceHandler() {
+        let handler = CocktailDataSourceHandler(tableView: self.tableView)
+        handler.dataPublisher
+            .sink { [weak self] event in
+                switch event {
+                case let .didSelect(cocktail):
+                    print("selected cocktail name:\(cocktail.name)")
+                }
+            }
+            .store(in: &cancellables)
+        dataSourceHandler = handler
     }
 
     func setupBindings() {
@@ -33,13 +55,27 @@ class CocktailMainListViewController: UIViewController, ViewControllerPortocol {
                     self?.showLoader(isVisible)
                 case .loaded(let items):
                     print("itemms loaded:\(items.count)")
+                    self?.dataSourceHandler.set(dataSource: items)
                 case .failed:
                     let retryAction = UIAlertAction.retryAction { [weak self] _ in
                         self?.viewModel.fetchList()
                     }
                     self?.showAlert(title: "Oops! Fetching failed.", message: "Please try again", actions: [retryAction])
+                case .navTitle(let title):
+                    self?.navigationController?.title = title
                 }
             }.store(in: &cancellables)
+    }
+    
+    private func setupFilters() {
+        let segmentedControl = UISegmentedControl(items: FilterType.allCases.map{ $0.rawValue })
+        segmentedControl.addTarget(self, action: #selector(segmentAction(_:)), for: .valueChanged)
+        segmentedControl.selectedSegmentIndex = 0
+        self.segmentView.addArrangedSubview(segmentedControl)
+    }
+    
+    @objc private func segmentAction(_ segmentedControl: UISegmentedControl) {
+        self.viewModel.filterType = FilterType.allCases[segmentedControl.selectedSegmentIndex]
     }
 
     /*
@@ -54,5 +90,14 @@ class CocktailMainListViewController: UIViewController, ViewControllerPortocol {
 
     deinit {
         cancellables.forEach { $0.cancel() }
+    }
+}
+
+extension CocktailMainListViewController {
+    static func buildVC() -> UINavigationController {
+        let cocktailVC = CocktailMainListViewController()
+        cocktailVC.navigationItem.title = FilterType.all.rawValue
+        let navVC = UINavigationController(rootViewController: cocktailVC)
+        return navVC
     }
 }

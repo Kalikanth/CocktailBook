@@ -15,6 +15,7 @@ class CocktailMainListViewModel {
         case loading(Bool)
         case loaded([Cocktail])
         case failed
+        case navTitle(String)
     }
     
     private var dataSubject = PassthroughSubject<ViewModelEvent, Never>()
@@ -30,16 +31,22 @@ class CocktailMainListViewModel {
         }
     }
     
-    var favoriteCocktails: Set<String> = []
+    var favoriteCocktails: Set<String> = [] {
+        didSet {
+            UserDefaults.saveUser(favourites: favoriteCocktails)
+        }
+    }
     
     private let service: CocktailsAPI
     private var cancellables: Set<AnyCancellable> = []
     
     init(service: CocktailsAPI) {
         self.service = service
+        self.favoriteCocktails = UserDefaults.getUserFavourites()
     }
     
     private func filterCocktails(filterType: FilterType) {
+        self.dataSubject.send(.navTitle(filterType.navTitle))
         switch filterType {
         case .all:
             filteredCocktails = cocktails
@@ -49,8 +56,8 @@ class CocktailMainListViewModel {
             filteredCocktails = cocktails.filter { $0.type == .nonAlcoholic }
         }
       
-        let favCocktails = filteredCocktails.filter{ favoriteCocktails.contains($0.id) }
-        let nonFavoriteCocktails = filteredCocktails.filter { !favoriteCocktails.contains($0.id) }
+        let favCocktails = filteredCocktails.filter{ favoriteCocktails.contains($0.id) }.sorted(by: { $0.name < $1.name })
+        let nonFavoriteCocktails = filteredCocktails.filter { !favoriteCocktails.contains($0.id) }.sorted(by: { $0.name < $1.name })
         
         filteredCocktails = favCocktails + nonFavoriteCocktails
         self.dataSubject.send(.loaded(filteredCocktails))

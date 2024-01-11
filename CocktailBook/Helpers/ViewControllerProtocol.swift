@@ -46,13 +46,3 @@ extension ViewControllerPortocol where Self: UIViewController {
     }
 }
 
-extension UIAlertAction {
-    
-    static func ok() -> UIAlertAction {
-        UIAlertAction(title: "Ok", style: .default)
-    }
-    
-    static func retryAction(_ handler: ((UIAlertAction) -> Void)?) -> UIAlertAction {
-        UIAlertAction(title: "Retry", style: .default,handler: handler)
-    }
-}
