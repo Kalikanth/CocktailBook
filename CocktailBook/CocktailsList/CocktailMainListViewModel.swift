@@ -13,7 +13,7 @@ class CocktailMainListViewModel {
     
     enum ViewModelEvent {
         case loading(Bool)
-        case loaded([Cocktail])
+        case loaded([CocktailTVCellViewModel])
         case failed
         case navTitle(String)
     }
@@ -33,7 +33,7 @@ class CocktailMainListViewModel {
     
     var favoriteCocktails: Set<String> = [] {
         didSet {
-            UserDefaults.saveUser(favourites: favoriteCocktails)
+            UserDefaults.saveUser(favourites: Array(favoriteCocktails))
         }
     }
     
@@ -60,7 +60,13 @@ class CocktailMainListViewModel {
         let nonFavoriteCocktails = filteredCocktails.filter { !favoriteCocktails.contains($0.id) }.sorted(by: { $0.name < $1.name })
         
         filteredCocktails = favCocktails + nonFavoriteCocktails
-        self.dataSubject.send(.loaded(filteredCocktails))
+        let viewModels = filteredCocktails.map{ mapToViewModel(cocktail: $0) }
+        self.dataSubject.send(.loaded(viewModels))
+    }
+    
+    func mapToViewModel(cocktail: Cocktail) -> CocktailTVCellViewModel {
+        let isFavourite = favoriteCocktails.contains(cocktail.id)
+        return CocktailTVCellViewModel(cocktail: cocktail, isFavourite: isFavourite)
     }
     
     func toggleFavorite(cocktailId: String) {

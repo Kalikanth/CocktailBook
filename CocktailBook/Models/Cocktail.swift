@@ -15,10 +15,14 @@ enum FilterType: String, CaseIterable, Codable {
     var navTitle: String {
         self.rawValue.capitalized
     }
+    
+    var index: Int {
+        FilterType.allCases.firstIndex(of: self) ?? 0
+    }
 }
 
 // MARK: - Cocktail Model
-struct Cocktail: Decodable, Identifiable {
+struct Cocktail: Codable, Identifiable {
     let id: String
     let name: String
     let type: FilterType

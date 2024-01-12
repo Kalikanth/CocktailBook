@@ -26,11 +26,12 @@ extension UserDefaults {
         UserDefaults.standard.set(value, forKey: key)
     }
     
-    static func saveUser(favourites: Set<String>) {
+    static func saveUser(favourites: [String]) {
         save(favourites, for: UserDefaults.favouriets)
     }
     
     static func getUserFavourites() -> Set<String> {
-        UserDefaults.standard.value(forKey: favouriets) as! Set<String>
+       let ids = UserDefaults.standard.value(forKey: favouriets) as? [String] ?? []
+       return Set(ids)
     }
 }

@@ -12,7 +12,7 @@ class CocktailMainListViewController: UIViewController, ViewControllerPortocol {
 
     @IBOutlet weak var segmentView: UIStackView!
     @IBOutlet weak var tableView: UITableView!
-    
+    private var filtersSegmentControl: UISegmentedControl!
     private var cancellables: Set<AnyCancellable> = []
     
     let viewModel: CocktailMainListViewModel = {
@@ -38,9 +38,21 @@ class CocktailMainListViewController: UIViewController, ViewControllerPortocol {
         let handler = CocktailDataSourceHandler(tableView: self.tableView)
         handler.dataPublisher
             .sink { [weak self] event in
+                guard let self = self else { return }
                 switch event {
-                case let .didSelect(cocktail):
-                    print("selected cocktail name:\(cocktail.name)")
+                case let .didSelect(viewModel):
+                    print("selected cocktail name:\(viewModel.cocktail.name)")
+                    let viewModel = CocktailDetailViewModel(isFavourite: viewModel.isFavourite, cocktail: viewModel.cocktail)
+                    
+                    viewModel.dataPublisher.sink { [weak self] event in
+                        switch event {
+                        case let .favourite(cocktailId):
+                            self?.viewModel.toggleFavorite(cocktailId: cocktailId)
+                        }
+                    }.store(in: &self.cancellables)
+                    
+                    let detailVC = CocktailDetailHostingViewController.buildVC(viewModel: viewModel)
+                    self.navigationController?.pushViewController(detailVC, animated: true)
                 }
             }
             .store(in: &cancellables)
@@ -68,14 +80,19 @@ class CocktailMainListViewController: UIViewController, ViewControllerPortocol {
     }
     
     private func setupFilters() {
-        let segmentedControl = UISegmentedControl(items: FilterType.allCases.map{ $0.rawValue })
-        segmentedControl.addTarget(self, action: #selector(segmentAction(_:)), for: .valueChanged)
-        segmentedControl.selectedSegmentIndex = 0
-        self.segmentView.addArrangedSubview(segmentedControl)
+        guard filtersSegmentControl == nil else {
+            filtersSegmentControl.selectedSegmentIndex = self.viewModel.filterType.index
+            return
+        }
+        filtersSegmentControl = UISegmentedControl(items: FilterType.allCases.map{ $0.rawValue })
+        filtersSegmentControl.addTarget(self, action: #selector(segmentAction(_:)), for: .valueChanged)
+        filtersSegmentControl.selectedSegmentIndex = 0
+        self.segmentView.addArrangedSubview(filtersSegmentControl)
     }
     
     @objc private func segmentAction(_ segmentedControl: UISegmentedControl) {
         self.viewModel.filterType = FilterType.allCases[segmentedControl.selectedSegmentIndex]
+        self.navigationItem.title = self.viewModel.filterType.rawValue
     }
 
     /*

@@ -13,13 +13,13 @@ import Combine
 class CocktailDataSourceHandler: NSObject {
     
     enum DataSourceEvent {
-        case didSelect(Cocktail)
+        case didSelect(CocktailTVCellViewModel)
     }
     
     private var tableView: UITableView
-    private var dataSource: [Cocktail] = [] {
+    private var dataSource: [CocktailTVCellViewModel] = [] {
         didSet {
-            self.tableView.reloadData()
+            reloadTableView()
         }
     }
     
@@ -37,8 +37,14 @@ class CocktailDataSourceHandler: NSObject {
         self.tableView.register(CocktailShortInfoTVCell.self, forCellReuseIdentifier: CocktailShortInfoTVCell.reuseIdentifier)
     }
     
-    func set(dataSource: [Cocktail]) {
+    func set(dataSource: [CocktailTVCellViewModel]) {
         self.dataSource = dataSource
+    }
+    
+    func reloadTableView() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
 }
@@ -66,51 +72,5 @@ extension CocktailDataSourceHandler: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.dataSubject.send(.didSelect(dataSource[indexPath.row]))
-    }
-}
-
-
-
-
-class CocktailShortInfoTVCell: UITableViewCell {
-    static let reuseIdentifier = "CocktailShortInfoTVCell"
-
-    var hostingController: UIHostingController<CocktailShortInfoView>?
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-    }
-    
-    func configureCell(with cocktail: Cocktail) {
-        let isFavourite = UserDefaults.getUserFavourites().contains(cocktail.id)
-        let swiftUIView = CocktailShortInfoView(cocktail: cocktail,isFavorite: isFavourite)
-        hostingController = UIHostingController(rootView: swiftUIView)
-        hostingController?.view.translatesAutoresizingMaskIntoConstraints = false
-        
-        let separator = UIView()
-        separator.backgroundColor = .secondarySystemBackground
-        separator.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(separator)
-        NSLayoutConstraint.activate([
-        separator.topAnchor.constraint(equalTo: topAnchor),
-        separator.leadingAnchor.constraint(equalTo: leadingAnchor),
-        separator.trailingAnchor.constraint(equalTo: trailingAnchor),
-        separator.heightAnchor.constraint(equalToConstant: 1)
-        ])
-        
-        if let hostingView = hostingController?.view {
-            addSubview(hostingView)
-
-            NSLayoutConstraint.activate([
-                hostingView.topAnchor.constraint(equalTo: separator.bottomAnchor),
-                hostingView.leadingAnchor.constraint(equalTo: leadingAnchor),
-                hostingView.trailingAnchor.constraint(equalTo: trailingAnchor),
-                hostingView.bottomAnchor.constraint(equalTo: bottomAnchor)
-            ])
-        }
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
