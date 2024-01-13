@@ -44,4 +44,12 @@ By initializing the object using `withFailure: .count(3)`, all the calls to the 
 
 ## 🤓 Disclaimer
 
-The texts and images are taken from multiple sources. They should not be shared with others or used in commercial products, they are only used to serve the assignment as temporary assets, nothing more.
+This project was created solely for personal practice and educational purposes. It is not intended for any commercial usage, and its primary purpose is for learning and skill development.
+
+**Copyright Notice:**
+
+The texts and images used in this project are sourced from multiple locations for the purpose of completing assignments and exercises. They should not be shared with others or used in any commercial products. If anyone has copyright concerns or issues with the content used, please contact me via email at [kalikanth007@gmail.com](mailto:kalikanth007@gmail.com) so that I can promptly address and remove the content in question.
+
+Thank you for your understanding.
+
+
